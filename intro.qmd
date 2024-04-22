@@ -2,11 +2,11 @@
 
 This chapter introduces what a recurrence plot is and explains how it
 can be analyzed using the most common measures that quantify features of
-the recurrence plot [@zbilut1992]. We will use some relatively simple
-examples, so that the basic concepts are not obscured by complications
-arising from more realistic data. We will deal with those issues in due
-time, but see @marwan2007 for a comprehensive introduction to recurrence
-plots with all the mathematical details.
+the recurrence plot. We will use some relatively simple examples, so
+that the basic concepts are not obscured by complications arising from
+more realistic data. We will deal with those issues in due time, but see
+@marwan2007 for a comprehensive introduction to recurrence plots with
+all the mathematical details.
 
 Now, let us explore what a recurrence plot is.
 

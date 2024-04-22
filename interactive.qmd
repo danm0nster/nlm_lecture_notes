@@ -1,0 +1,84 @@
+# Example of interactivity {#sec-interactive}
+
+This is an interactive web page that needs to load a few things before
+it is ready, so please be patient. It runs R in your browser, so all
+computations happen on your own computer, not on a server. You do not
+need to have R installed. Once you see WebR Status above as "Ready!" you
+can begin to run code and see the output (if any). You will need to run
+the code cells in order, since later cells depend on variables and
+computations in earlier ones. You can also edit the cells and change the
+code --- something you will have to do in order to finish some
+incomplete code.
+
+Below, is a categorical time series assigned to the vector `cat1`. In
+this example you will plot the time series and perform a categorical
+recurrence quantification analysis.
+
+```{webr-r}
+cat1 <- c(
+  4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1,
+  1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3,
+  3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4,
+  4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4,
+  4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1,
+  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+  4, 4, 4, 4, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 1, 1,
+  1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+)
+
+message("Finished! You can now proceed.")
+```
+
+First, make a plot of the time series.
+
+```{webr-r}
+plot(cat1, type = 'b', axes = F, ylab = "Categorical TS1") 
+axis(2, at = c(1, 2, 3, 4), labels = c("1", "2", "3", "4"), las = 1)
+axis(1, at = c(0, 100, 200, 300, 400, 500, 600), 
+     labels = c("0", "100", "200", "300", "400", "500", "600"), las = 1)
+```
+
+Now we load a special version of the `crqa` package that can run in the
+browser. There may be a warning that it was compiled under a different
+version of R, which you can ignore.
+
+```{webr}
+webr::install("crqa", repos = "https://tildeweb.au.dk/~au78495/repo")
+library(crqa)
+```
+
+Now, perform a categorical recurrence analysis. Here, you will have to
+change some parameters in order to make it run correctly. These have
+been marked by comments in the code below.
+
+```{webr-r}
+RQA_cat1 <- crqa(cat1, cat1,
+                 delay = 2,  # CHOOSE AN APPROPRIATE PARAMETER
+                 embed = 3,  # CHOOSE AN APPROPRIATE PARAMETER
+                 radius = 6, # CHOOSE AN APPROPRIATE PARAMETER
+                 method = "rqa",
+                 datatype = "categorical")
+```
+
+When you have made the changes, you can execute the code below to show
+the recurrence plot.
+
+```{webr}
+plot_rp(RQA_cat1$RP)
+```

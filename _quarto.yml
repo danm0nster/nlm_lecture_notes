@@ -1,0 +1,41 @@
+project:
+  type: book
+
+book:
+  title: "Nonlinear Methods Workshop Lecture Notes"
+  author: "Dan Mønster"
+  date: "4/16/2024"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - rqa.qmd
+    - crqa.qmd
+    - mdrqa.qmd
+    - parameter_estimation.qmd
+    - parameter_sensitivity.qmd
+    - fractal_analysis.qmd
+    - ccm.qmd
+    - interactive.qmd
+    - summary.qmd
+    - references.qmd
+  downloads: [pdf]
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+    fig-align: center
+
+editor: visual
+
+engine: knitr
+
+webr:
+  packages: ['ggplot2', 'dplyr', 'tidyr', 'pracma', 'rdist']
+
+filters:
+  - webr
+
