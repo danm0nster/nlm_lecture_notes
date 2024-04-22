@@ -4,3 +4,6 @@
 .Ruserdata
 
 /.quarto/
+
+# Ignore directory with docker output files for r-wasm cross-compilation (needed only to deploy packages)
+docker_r-wasm/
