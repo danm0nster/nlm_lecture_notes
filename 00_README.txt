@@ -1,6 +1,6 @@
 This file describes how to get started and some important preliminary knowledge.
 
-This project (in the RStudio sense of the word) MUST be openined by double
+This project (in the RStudio sense of the word) MUST be opened by double
 clicking the file 01_NLM_lecture_notes.Rproj
 
 Numbers for some of the important files, so that you will find them near the
