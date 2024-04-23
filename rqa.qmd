@@ -2,7 +2,8 @@
 
 Some text ...
 
-An inline equation can use LaTeX mathematics, e.g., $f(t) = t^2 e^{-2t}$.
+An inline equation can use LaTeX mathematics, e.g.,
+$f(t) = t^2 e^{-2t}$.
 
 It is also possible to have display equations that take up a whole line:
 $$
@@ -28,12 +29,12 @@ summed_numbers <- sum(numbers)
 
 If you are curious, the sum is `{r} summed_numbers`, something the young
 Carl Friedrich Gauss, allegedly,
-[solved](https://www.americanscientist.org/article/gausss-day-of-reckonin) in
-class as a young schoolboy.
+[solved](https://www.americanscientist.org/article/gausss-day-of-reckoning)
+in class as a young schoolboy.
 
 Plotting the sine of these numbers mapped to the interval $[0, 2\pi]$ is
-undoubtedly a much more daunting task to perform manually, but --- again --- we
-can ask R to do it for us:
+undoubtedly a much more daunting task to perform manually, but --- again
+--- we can ask R to do it for us:
 
 ```{r}
 library(ggplot2)
@@ -42,4 +43,3 @@ ggplot(data.frame(x = numbers * 2 * pi / 100),
   geom_function(fun = sin) +
   theme_classic()
 ```
-
