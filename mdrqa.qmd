@@ -2,16 +2,15 @@
 
 Here you will find 6 exercises to learn different aspects of MdRQA and some questions to discuss.
 
-1. Performing MdRQA on the Lorenz system. 
-How do the results differ from those found using RQA? 
-For what reasons?
+1.  Performing MdRQA on the Lorenz system. How do the results differ from those found using RQA? For what reasons?
 
 ```{r}
 # set path...
-setwd("C:/Users/alont/OneDrive/שולחן העבודה/Work/Leuphana/NLM2024/MdRQA Material/MdRQA_exercises")
+setwd("...")
 
 # load package crqa
 library(crqa)
+library(ggplot2)
 
 # Run MdRQA on the 3d-Lorenz system
 
@@ -27,21 +26,26 @@ head(res)
 
 # plot RP
 RP <- res$RP
-plotRP(RP,show_ticks = TRUE,unit = 500, labelx = "Time", labely = "Time", cols = "black", pcex = .5 , pch = 15)
+plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
 
-2. The differences between a Theiler Window (tw) of 1 and 0.
-What measures were more affected by the change?
-Would you choose the same Theiler Window for CRQA?
+2.  The differences between a Theiler Window (tw) of 1 and 0.
 
-3. The effects of noise on MdRQA outcomes.
-How did the RP and the recurrence measures change?
-What could you do to receive more informative MdRQA outcomes?
+    Adjust the code above to check.
 
+    What measures were more affected by the change?
+
+    Would you choose the same Theiler Window for CRQA?
+
+3.  The effects of noise on MdRQA outcomes.
+
+    How did the RP and the recurrence measures change?
+
+    What could you do to receive more informative MdRQA outcomes?
 
 ```{r}
 # set path...
-setwd("C:/Users/alont/OneDrive/שולחן העבודה/Work/Leuphana/NLM2024/MdRQA Material/MdRQA_exercises")
+setwd("...")
 
 # load package crqa
 library(crqa)
@@ -63,18 +67,18 @@ head(res)
 
 # plot RP
 RP <- res$RP
-plotRP(RP,show_ticks = TRUE,unit = 500, labelx = "Time", labely = "Time", cols = "black", pcex = .5 , pch = 15)
+plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
-Exercise 4: The effect of data normalization in MdRQA.
 
-Load the file R.csv and add it to the Lorenz-data.frame as fourth variable.
-However,now use the scale()-function to z-score the data from the R.csv-file before adding it as fourth variable to the Lorenz data frame.
+4. The effect of data normalization in MdRQA.
+
+Load the file R.csv and add it to the Lorenz-data.frame as fourth variable. However, now use the scale() function to z-score the data from the R.csv-file before adding it as fourth variable to the Lorenz data frame.
 
 How do the results change?
 
 ```{r}
 # set path...
-setwd("C:/Users/alont/OneDrive/שולחן העבודה/Work/Leuphana/NLM2024/MdRQA Material/MdRQA_exercises")
+setwd("...")
 
 # load package crqa
 library(crqa)
@@ -99,13 +103,41 @@ head(res)
 
 # plot RP
 RP <- res$RP
-plotRP(RP,show_ticks = TRUE,unit = 500, labelx = "Time", labely = "Time", cols = "black", pcex = .5 , pch = 15)
+plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
-6. Use Lagged MdRQA to find the lags in the messed Lorenz system.
-Re-do the analysis from Exercise 5, but use the lagged MdRQA wrapper.
-Here we resample the Lorenz system for a quicker computation.
 
-First run the Lagged MdRQA function:
+5. Rerun MdRQA on the Lorenz system with z-scored data (normalize = 2). 
+Find a radius that yields %REC=5-10%.
+
+```{r}
+# set path...
+setwd("...")
+
+# load package crqa
+library(crqa)
+library(ggplot2)
+
+# Run MdRQA on the 3d-Lorenz system
+
+# load data
+Lorenz <- read.csv("Lorenz.csv")
+
+# run MdRQA
+res <- crqa(ts1=Lorenz, ts2=Lorenz, delay=1, embed=1, radius=1.2,
+            normalize=2, tw=1, method="mdcrqa")
+
+# check out recurrence measures
+head(res)
+
+# plot RP (it takes a minute here)
+RP <- res$RP
+plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
+```
+
+6. Use Lagged MdRQA to find the lags in the messed Lorenz system. Re-do the analysis from Exercise 5, but use the lagged MdRQA wrapper. Here we resample the Lorenz system for a quicker computation.
+
+First run the Lagged MdRQA function: (no need to dive in)
+
 ```{r}
 laggedMdrqa <- function(maxlag, ts1, ts2, delay, embed, rescale,
                         radius, normalize, mindiagline, minvertline, tw, method) {
@@ -190,12 +222,11 @@ return(results)
 }
 ```
 
-Choose some value for the „maxlag“ parameter between 10-30.
-Investigate the lag structure compared to the Lorenz system plot.
+Choose some value for the „maxlag“ parameter between 10-30. Investigate the lag structure compared to the Lorenz system plot.
 
 ```{r}
 # set path...
-setwd("C:/Users/alont/OneDrive/שולחן העבודה/Work/Leuphana/NLM2024/MdRQA Material/MdRQA_24/MdRQA_exercises")
+setwd("...")
 
 # load packages
 library(crqa)
@@ -229,8 +260,8 @@ res <- laggedMdrqa(maxlag = 20,
                    delay = 1,
                    embed = 1,
                    rescale = 0,
-                   radius = 1.5,
-                   normalize = 0,
+                   radius = 0.5,
+                   normalize = 2,
                    mindiagline = 2,
                    minvertline = 2,
                    tw = 1,
