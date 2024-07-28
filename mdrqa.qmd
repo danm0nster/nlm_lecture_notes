@@ -1,10 +1,14 @@
 # Multidimensional Recurrence Quantification Analysis
 
-Here you will find 6 exercises to learn different aspects of MdRQA and some questions to discuss.
+Here you will find 6 exercises to learn different aspects of MdRQA and
+some questions to discuss.
 
-1.  Performing MdRQA on the Lorenz system. How do the results differ from those found using RQA? For what reasons?
+1.  Performing MdRQA on the Lorenz system. How do the results differ
+    from those found using RQA? For what reasons?
 
 ```{r}
+#| eval: false
+
 # set path...
 setwd("...")
 
@@ -44,6 +48,8 @@ plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size =
     What could you do to receive more informative MdRQA outcomes?
 
 ```{r}
+#| eval: false
+
 # set path...
 setwd("...")
 
@@ -70,13 +76,18 @@ RP <- res$RP
 plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
 
-4. The effect of data normalization in MdRQA.
+4.  The effect of data normalization in MdRQA.
 
-Load the file R.csv and add it to the Lorenz-data.frame as fourth variable. However, now use the scale() function to z-score the data from the R.csv-file before adding it as fourth variable to the Lorenz data frame.
+Load the file R.csv and add it to the Lorenz-data.frame as fourth
+variable. However, now use the scale() function to z-score the data from
+the R.csv-file before adding it as fourth variable to the Lorenz data
+frame.
 
 How do the results change?
 
 ```{r}
+#| eval: false
+
 # set path...
 setwd("...")
 
@@ -106,10 +117,12 @@ RP <- res$RP
 plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
 
-5. Rerun MdRQA on the Lorenz system with z-scored data (normalize = 2). 
-Find a radius that yields %REC=5-10%.
+5.  Rerun MdRQA on the Lorenz system with z-scored data (normalize = 2).
+    Find a radius that yields %REC=5-10%.
 
 ```{r}
+#| eval: false
+
 # set path...
 setwd("...")
 
@@ -134,11 +147,15 @@ RP <- res$RP
 plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
 
-6. Use Lagged MdRQA to find the lags in the messed Lorenz system. Re-do the analysis from Exercise 5, but use the lagged MdRQA wrapper. Here we resample the Lorenz system for a quicker computation.
+6.  Use Lagged MdRQA to find the lags in the messed Lorenz system. Re-do
+    the analysis from Exercise 5, but use the lagged MdRQA wrapper. Here
+    we resample the Lorenz system for a quicker computation.
 
 First run the Lagged MdRQA function: (no need to dive in)
 
 ```{r}
+#| eval: false
+
 laggedMdrqa <- function(maxlag, ts1, ts2, delay, embed, rescale,
                         radius, normalize, mindiagline, minvertline, tw, method) {
   # Note:
@@ -222,9 +239,12 @@ return(results)
 }
 ```
 
-Choose some value for the „maxlag“ parameter between 10-30. Investigate the lag structure compared to the Lorenz system plot.
+Choose some value for the „maxlag“ parameter between 10-30. Investigate
+the lag structure compared to the Lorenz system plot.
 
 ```{r}
+#| eval: false
+
 # set path...
 setwd("...")
 
