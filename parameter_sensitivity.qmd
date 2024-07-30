@@ -1,45 +1,305 @@
 # Parameter Sensitivity Analysis for RQA
 
-Some text ...
-
-An inline equation can use LaTeX mathematics, e.g.,
-$f(t) = t^2 e^{-2t}$.
-
-It is also possible to have display equations that take up a whole line:
-$$
-  z_n = z_{n + 1}^2 + c.
-$$
+Under construction
 
 ```{r}
 #| echo: false
+#| eval: false
 
-# Note that this code block is hidden to the user, since echo is set to false
-# in the special comment above which is a code chunk option.
+# This is the script from 2023
 
-numbers <- 1:100
-```
+# set path...
+setwd("")
 
-Consider the numbers `{r} numbers`.
-
-You can easily sum these (stored in the variable `numbers`) using R:
-
-```{r}
-summed_numbers <- sum(numbers)
-```
-
-If you are curious, the sum is `{r} summed_numbers`, something the young
-Carl Friedrich Gauss, allegedly,
-[solved](https://www.americanscientist.org/article/gausss-day-of-reckoning)
-in class as a young schoolboy.
-
-Plotting the sine of these numbers mapped to the interval $[0, 2\pi]$ is
-undoubtedly a much more daunting task to perform manually, but --- again
---- we can ask R to do it for us:
-
-```{r}
+# load packages
+library(crqa)
+library(dplyr)
 library(ggplot2)
-ggplot(data.frame(x = numbers * 2 * pi / 100),
-       aes(x = x)) +
-  geom_function(fun = sin) +
+
+# Load data files
+# You may need to change the path, depending on your working directory.
+load("../s09_SampleParameterEstimation/SampleAnalysis_exercises/dataSampleAnalysis.Rdata")
+
+
+# Set the experimental condition
+# (o)ral reading = 0, (s)ilent reading = 1
+CON <- factor(c(rep(0,6),rep(1,6))) 
+
+# Enter the estimated parameters from the previous exercise
+opt_delay <-  1
+opt_embed <-  4
+opt_radius <-  0.65
+
+delay_values <- seq(1, ...) # Set values here
+embed_values <- # Set values here
+radius_values <-  # Set values here
+  
+# Start with an empty data frame for the RQA results and parameters
+exploration <- data.frame()
+
+for (d in delay_values) {
+  for (e in embed_values) {
+    for (r in radius_values) {
+      for(i in 1:12) {
+        temp <- crqa(ts1 = data[1:1098, i],
+                     ts2 = data[1:1098, i],
+                     rescale = 0,
+                     delay = d,
+                     embed = e,
+                     radius = r,
+                     normalize = 2,
+                     tw = 1,
+                     method = "rqa")
+        result <- data.frame(
+          REC = temp$RR,
+          CON = CON[i],
+          delay = d,
+          embed = e,
+          radius = r
+        )
+        exploration <- bind_rows(exploration, result)
+      }
+    }
+  }
+}
+
+# Compute exp_test which holds the results of the t-test for each set of
+# parameters.
+exp_test <- data.frame()
+
+for (d in delay_values) {
+  for (e in embed_values) {
+    for (r in radius_values) {
+      # Add t-test here
+      TT <- t.test(REC ~ CON, 
+                   data = exploration |>
+                     filter(delay == d, embed == e, radius == r))
+      exp_test <- bind_rows(
+        exp_test,
+        data.frame(
+          delay = d,
+          embed = e,
+          radius = r,
+          p_value = TT$p.value,
+          difference = TT$estimate[1] - TT$estimate[2],
+          CI_lo = TT$conf.int[1],
+          CI_hi = TT$conf.int[2]
+        )
+      )
+    }
+  }
+}
+
+# Add a variable for whether the t-test is significant
+exp_test <- exp_test |>
+  mutate(significant = (p_value < 0.05))
+
+
+# Plot the result for the optimal parameters
+ggplot(exploration |> 
+         filter(delay == opt_delay, 
+                embed == opt_embed,
+                radius == opt_radius),
+       aes(x = CON, y = REC)) +
+  geom_boxplot() +
+  geom_point(aes(y = REC), position = position_jitter()) +
+  labs(title = "Difference in conditions with chosen parameters") +
   theme_classic()
+
+
+
+# Same plot but as a violin plot
+ggplot(exploration |> 
+         filter(delay == opt_delay, 
+                embed == opt_embed,
+                radius == opt_radius),
+       aes(x = CON, y = REC)) +
+  geom_violin() +
+  geom_point(aes(y = REC), position = position_jitter()) +
+  labs(title = "Difference in conditions with chosen parameters") +
+  theme_classic()
+
+
+# Look at result of t-test for different values of embedding dimension
+ggplot(exp_test |> 
+         filter(delay == opt_delay, radius == opt_radius),
+       aes(x = embed, y = p_value)) +
+  geom_hline(yintercept = 0.05, linetype = "dashed") +
+  geom_line() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             size = 4, colour = "blue") +
+  xlab("Embedding dimension") +
+  ylab("p-value") +
+  theme_bw()
+
+
+ggplot(exp_test |> 
+         filter(delay == opt_delay, radius == opt_radius),
+       aes(x = embed, y = difference)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_errorbar(aes(ymin = CI_lo, ymax = CI_hi)) +
+  geom_point() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             aes(y = difference),
+             size = 4, colour = "blue") +
+  xlab("Embedding dimension") +
+  ylab("95% CI") +
+  theme_bw()
+
+
+
+# Look at result of t-test for different values of delay
+ggplot(exp_test |> 
+         filter(embed == opt_embed, radius == opt_radius),
+       aes(x = delay, y = p_value)) +
+  geom_hline(yintercept = 0.05, linetype = "dashed") +
+  geom_line() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             size = 4, colour = "blue") +
+  xlab("Delay") +
+  ylab("p-value") +
+  theme_bw()
+
+
+ggplot(exp_test |> 
+         filter(embed == opt_embed, radius == opt_radius),
+       aes(x = delay, y = difference)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_errorbar(aes(ymin = CI_lo, ymax = CI_hi)) +
+  geom_point() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             aes(y = difference),
+             size = 4, colour = "blue") +
+  xlab("Delay") +
+  ylab("95% CI") +
+  theme_bw()
+
+
+
+# Look at result of t-test for different values of radius
+ggplot(exp_test |> 
+         filter(embed == opt_embed, delay == opt_delay),
+       aes(x = radius, y = p_value)) +
+  geom_hline(yintercept = 0.05, linetype = "dashed") +
+  geom_line() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             size = 4, colour = "blue") +
+  xlab("Radius") +
+  ylab("p-value") +
+  theme_bw()
+
+
+ggplot(exp_test |> 
+         filter(embed == opt_embed, delay == opt_delay),
+       aes(x = radius, y = difference)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_errorbar(aes(ymin = CI_lo, ymax = CI_hi)) +
+  geom_point() +
+  geom_point(data = exp_test |> 
+               filter(embed == opt_embed,
+                      radius == opt_radius,
+                      delay == opt_delay),
+             aes(y = difference),
+             size = 4, colour = "blue") +
+  xlab("Radius") +
+  ylab("95% CI") +
+  theme_bw()
+
+
+#
+# Keep radius fixed. Vary the other parameters.
+#
+ggplot(exploration |> filter(radius == opt_radius),
+       aes(x = CON, y = REC)) +
+  geom_rect(data = exp_test |> filter(radius == opt_radius),
+            aes(fill = significant), inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  geom_rect(data = exp_test |>
+              filter(embed == opt_embed,
+                     radius == opt_radius,
+                     delay == opt_delay),
+            colour = "blue", 
+            linewidth = 1.5,
+            fill = NA,
+            inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  geom_violin() +
+  geom_point(position = position_jitter(),
+             size = 1, shape = "o") +
+  theme_classic() +
+  facet_grid(delay ~ embed) +
+  theme(legend.position = "top")
+
+
+# Same but with radius as facet instead of delay
+ggplot(exploration |> filter(delay == opt_delay),
+       aes(x = CON, y = REC)) +
+  geom_rect(data = exp_test |> filter(delay == opt_delay),
+            aes(fill = significant), inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  geom_rect(data = exp_test |>
+              filter(embed == opt_embed,
+                     radius == opt_radius,
+                     delay == opt_delay),
+            colour = "blue", 
+            linewidth = 1.5,
+            fill = NA,
+            inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  # geom_boxplot() +
+  geom_violin() +
+  geom_point(position = position_jitter(),
+             size = 1, shape = "o") +
+  theme_classic() +
+  facet_grid(radius ~ embed) +
+  theme(legend.position = "top")
+
+
+
+# Same but with embedding fixed
+ggplot(exploration |> filter(embed == opt_embed),
+       aes(x = CON, y = REC)) +
+  geom_rect(data = exp_test |> filter(embed == opt_embed),
+            aes(fill = significant), inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  geom_rect(data = exp_test |>
+              filter(embed == opt_embed,
+                     radius == opt_radius,
+                     delay == opt_delay),
+            colour = "blue", 
+            linewidth = 1.5,
+            fill = NA,
+            inherit.aes = FALSE,
+            xmin = -Inf, xmax = Inf,
+            ymin = -Inf, ymax = Inf, alpha = 0.3) +
+  # geom_boxplot() +
+  geom_violin() +
+  geom_point(position = position_jitter(),
+             size = 1, shape = "o") +
+  theme_classic() +
+  facet_grid(delay ~ radius) +
+  theme(legend.position = "top")
+
+
 ```
+

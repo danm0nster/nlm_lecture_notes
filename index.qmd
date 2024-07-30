@@ -1,21 +1,8 @@
 # Preface {.unnumbered}
 
-This is a demonstration and test of online lecture notes for an R-based
-course or workshop. In this case the [Nonlinear Methods
+Online lecture notes for [Nonlinear Methods
 Workshop](https://www.leuphana.de/institute/isep/psychologie-und-nachhaltigkeit/workshops/2024-jul-nonlinear-methods-for-psychological-and-social-sciences.html)
-held at Leuphana University in Lüneburg.
+held at Leuphana University in Lüneburg, 29 July -- 2 August 2024.
 
-The lecture notes are written in Quarto markdown in Rstudio using the
-Quarto book document format.
-
-For a "normal" page, see  @sec-introduction. For a more advanced example
-where the user can interact with a live instance of R, see @sec-interactive.
-
-Note that references are handled nicely, and there is even a [PDF version](Nonlinear-Methods-Workshop-Lecture-Notes.pdf) of
+There is also a [PDF version](Nonlinear-Methods-Workshop-Lecture-Notes.pdf) of
 the lecture notes that can be downloaded.
-
-The book is fully searchable, and there is an option for users to annotate
-both privately and as part of a group (but this is not enabled in the current
-demonstration).
-
-To learn more about Quarto books visit <https://quarto.org/docs/books>.

@@ -1,3 +1,13 @@
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+library(stringr)
+library(ggplot2)
+library(dplyr)
+```
+
 # Introduction to recurrence plots {#sec-introduction}
 
 This chapter introduces what a recurrence plot is and explains how it
@@ -35,7 +45,6 @@ cat(popcorn_text)
 ```{r}
 #| echo: false
 
-library(stringr)
 
 popcorn_raw <- gsub("\\n", " ", popcorn_text)
 # TODO: Also remove space, comma, period, etc.?
@@ -71,8 +80,6 @@ The R code shown below will compute and display the recurrence plot.
 
 
 library(crqa)
-# We could create a package, NLM, instead
-source("R/utils.R")
 
 rp <- crqa(popcorn, popcorn,
            delay = 0,

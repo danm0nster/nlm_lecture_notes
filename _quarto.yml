@@ -3,7 +3,7 @@ project:
 
 book:
   title: "Nonlinear Methods Workshop Lecture Notes"
-  author: "Dan Mønster"
+  author: "Dan Mønster, Alon Tomashin, Ralf Cox, Giuseppe Leonardi, Sebastian Wallot"
   date: "4/16/2024"
   chapters:
     - index.qmd
@@ -15,8 +15,6 @@ book:
     - parameter_sensitivity.qmd
     - fractal_analysis.qmd
     - ccm.qmd
-    - interactive.qmd
-    - summary.qmd
     - references.qmd
   downloads: [pdf]
 
