@@ -1,7 +1,10 @@
 # Multidimensional Recurrence Quantification Analysis
 
 Here you will find 6 exercises to learn different aspects of MdRQA and
-some questions to discuss.
+some questions to discuss. 
+Copy the codes to RStudio, set the working directory to 06_MdRQA (setwd),
+and run the codes to look for the solutions. 
+(Make sure you have 'crqa' and 'ggplot2' installed)
 
 1.  Performing MdRQA on the Lorenz system. How do the results differ
     from those found using RQA? For what reasons?
@@ -50,9 +53,6 @@ plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size =
 ```{r}
 #| eval: false
 
-# set path...
-setwd("...")
-
 # load package crqa
 library(crqa)
 
@@ -88,9 +88,6 @@ How do the results change?
 ```{r}
 #| eval: false
 
-# set path...
-setwd("...")
-
 # load package crqa
 library(crqa)
 
@@ -123,9 +120,6 @@ plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size =
 ```{r}
 #| eval: false
 
-# set path...
-setwd("...")
-
 # load package crqa
 library(crqa)
 library(ggplot2)
@@ -147,14 +141,17 @@ RP <- res$RP
 plot_rp(RP, xlabel = "Time", ylabel = "Time", geom = "void") + geom_point(size = 0.5)
 ```
 
-6.  Use Lagged MdRQA to find the lags in the messed Lorenz system. Re-do
-    the analysis from Exercise 5, but use the lagged MdRQA wrapper. Here
-    we resample the Lorenz system for a quicker computation.
+6.  Use Lagged MdRQA to find the lags in the Lorenz system, inspect the Lorenz time series.
+    Do the lags seem reasonable?
+    Use the lagged MdRQA wrapper. Here we resample the Lorenz system for a quicker computation.
 
 First run the Lagged MdRQA function: (no need to dive in)
+Then use the next code for the task.
 
 ```{r}
 #| eval: false
+# Install relevant package
+install.packages('tcpl')
 
 laggedMdrqa <- function(maxlag, ts1, ts2, delay, embed, rescale,
                         radius, normalize, mindiagline, minvertline, tw, method) {
@@ -245,9 +242,6 @@ the lag structure compared to the Lorenz system plot.
 ```{r}
 #| eval: false
 
-# set path...
-setwd("...")
-
 # load packages
 library(crqa)
 library(ggplot2)
@@ -274,7 +268,7 @@ ggplot(down_Lorenz, aes(x = r)) +
 
 
 # run lagged Mdrqa - chose a value for maxlag between 10 and 30
-res <- laggedMdrqa(maxlag = 20,
+res <- laggedMdrqa(maxlag = ...,
                    ts1 = down_Lorenz[,1:3],
                    ts2 = down_Lorenz[,1:3],
                    delay = 1,
