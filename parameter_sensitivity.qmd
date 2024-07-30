@@ -1,14 +1,16 @@
 # Parameter Sensitivity Analysis for RQA
 
-Under construction
+Assuming we are dealing with continuous time series rather than
+categorical time series, we estimate embedding parameters (delay and
+embedding dimension) as well as an appropriate radius parameter used to
+construct recurrence plots.
 
 ```{r}
-#| echo: false
+#| echo: true
 #| eval: false
 
-# This is the script from 2023
 
-# set path...
+# You may need to set the path here
 setwd("")
 
 # load packages
@@ -17,9 +19,8 @@ library(dplyr)
 library(ggplot2)
 
 # Load data files
-# You may need to change the path, depending on your working directory.
-load("../s09_SampleParameterEstimation/SampleAnalysis_exercises/dataSampleAnalysis.Rdata")
-
+# You may need to change the path, depending on your working directory and where you have the file.
+load("../07_sample_analyses/dataSampleAnalysis_new.Rdata")
 
 # Set the experimental condition
 # (o)ral reading = 0, (s)ilent reading = 1
@@ -30,9 +31,10 @@ opt_delay <-  1
 opt_embed <-  4
 opt_radius <-  0.65
 
+# Now assign the part of parameter space to be explored
 delay_values <- seq(1, ...) # Set values here
-embed_values <- # Set values here
-radius_values <-  # Set values here
+embed_values <-             # Set values here
+radius_values <-            # Set values here
   
 # Start with an empty data frame for the RQA results and parameters
 exploration <- data.frame()
@@ -41,6 +43,7 @@ for (d in delay_values) {
   for (e in embed_values) {
     for (r in radius_values) {
       for(i in 1:12) {
+        # Note: we exclude the last data point
         temp <- crqa(ts1 = data[1:1098, i],
                      ts2 = data[1:1098, i],
                      rescale = 0,
@@ -302,4 +305,3 @@ ggplot(exploration |> filter(embed == opt_embed),
 
 
 ```
-
