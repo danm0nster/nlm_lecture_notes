@@ -353,90 +353,87 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <p>First run the Lagged MdRQA function: (no need to dive in) Then use the next code for the task.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install relevant package</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'tcpl'</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>laggedMdrqa <span class="ot">&lt;-</span> <span class="cf">function</span>(maxlag, ts1, ts2, delay, embed, rescale,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                        radius, normalize, mindiagline, minvertline, tw, method) {</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Note:</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This function wraps the crqa()-function from 'crqa' package.</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># In order to run the function, the packages 'crqa' and 'tcpl',</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># as well as their dependencies, need to be installed and loaded.</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The authors give no warranty for the correct functioning of the software and cannot be held legally accountable.</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># load libraries</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tcpl)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crqa)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># infer parameters to create empty matrix</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>noTs <span class="ot">&lt;-</span> <span class="fu">dim</span>(ts1)[<span class="dv">2</span>]</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>lagList <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">ncol =</span> noTs<span class="sc">+</span><span class="dv">1</span>, <span class="at">nrow =</span> (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>noTs)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># compute list of lag combinations</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>noTs) {</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    lagList[,i] <span class="ot">&lt;-</span><span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span>maxlag, <span class="at">each =</span> (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>(i<span class="dv">-1</span>), (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>(noTs<span class="sc">-</span>i))</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># equate lags on lag0</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>noTs) {</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs] <span class="ot">&lt;-</span> lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs]<span class="sc">-</span><span class="fu">min</span>(lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs])</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># compute lag identifier</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>noTs) {</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  lagList[,noTs<span class="sc">+</span><span class="dv">1</span>] <span class="ot">&lt;-</span> lagList[,noTs<span class="sc">+</span><span class="dv">1</span>] <span class="sc">+</span> lagList[,i]<span class="sc">*</span><span class="dv">100</span><span class="sc">^</span>(noTs<span class="sc">-</span>i)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>laggedMdrqa <span class="ot">&lt;-</span> <span class="cf">function</span>(maxlag, ts1, ts2, delay, embed, rescale,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                        radius, normalize, mindiagline, minvertline, tw, method) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Note:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This function wraps the crqa()-function from 'crqa' package.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># In order to run the function, the package 'crqa',</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># as well its dependencies, need to be installed and loaded.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The authors give no warranty for the correct functioning of </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># the software and cannot be held legally accountable.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># load libraries</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crqa)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># infer parameters to create empty matrix</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>noTs <span class="ot">&lt;-</span> <span class="fu">dim</span>(ts1)[<span class="dv">2</span>]</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>lagList <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">ncol =</span> noTs<span class="sc">+</span><span class="dv">1</span>, <span class="at">nrow =</span> (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>noTs)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># compute list of lag combinations</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>noTs) {</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    lagList[,i] <span class="ot">&lt;-</span><span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span>maxlag, <span class="at">each =</span> (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>(i<span class="dv">-1</span>), (maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>(noTs<span class="sc">-</span>i))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># equate lags on lag0</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(maxlag<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span>noTs) {</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs] <span class="ot">&lt;-</span> lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs]<span class="sc">-</span><span class="fu">min</span>(lagList[i,<span class="dv">1</span><span class="sc">:</span>noTs])</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># compute lag identifier</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>noTs) {</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  lagList[,noTs<span class="sc">+</span><span class="dv">1</span>] <span class="ot">&lt;-</span> lagList[,noTs<span class="sc">+</span><span class="dv">1</span>] <span class="sc">+</span> lagList[,i]<span class="sc">*</span><span class="dv">100</span><span class="sc">^</span>(noTs<span class="sc">-</span>i)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co"># discard all lags that are not unique</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>lagList <span class="ot">&lt;-</span> <span class="fu">subset</span>(lagList, <span class="fu">duplicated</span>(lagList[,noTs<span class="sc">+</span><span class="dv">1</span>]) <span class="sc">==</span> <span class="cn">FALSE</span>)</span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co"># discard all lags that are not unique</span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>lagList <span class="ot">&lt;-</span> <span class="fu">subset</span>(lagList, <span class="fu">duplicated</span>(lagList[,noTs<span class="sc">+</span><span class="dv">1</span>]) <span class="sc">==</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co"># create results matrix and add lag parameters</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">nrow =</span> <span class="fu">dim</span>(lagList)[<span class="dv">1</span>], <span class="at">ncol =</span> (<span class="dv">9</span><span class="sc">+</span><span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>results[,<span class="dv">10</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">+</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">2</span>))] <span class="ot">&lt;-</span> lagList[,<span class="dv">1</span><span class="sc">:</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>)]</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co"># run lagged mdrqa</span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(lagList)[<span class="dv">1</span>]) {</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create temporary data matrix</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  temp_ts1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="fu">dim</span>(ts1)[<span class="dv">2</span>], <span class="at">nrow =</span> <span class="fu">length</span>((<span class="dv">1</span><span class="sc">+</span>lagList[i,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts1)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,<span class="dv">1</span>])))</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  temp_ts2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="fu">dim</span>(ts2)[<span class="dv">2</span>], <span class="at">nrow =</span> <span class="fu">length</span>((<span class="dv">1</span><span class="sc">+</span>lagList[i,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts2)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,<span class="dv">1</span>])))</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># construct lagged time series</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(ts1)[<span class="dv">2</span>]) {</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    temp_ts1[,j] <span class="ot">&lt;-</span> ts1[(<span class="dv">1</span><span class="sc">+</span>lagList[i,j])<span class="sc">:</span>(<span class="fu">dim</span>(ts1)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,j]),j]</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co"># create results matrix and add lag parameters</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">nrow =</span> <span class="fu">dim</span>(lagList)[<span class="dv">1</span>], <span class="at">ncol =</span> (<span class="dv">9</span><span class="sc">+</span><span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>results[,<span class="dv">10</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">+</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">2</span>))] <span class="ot">&lt;-</span> lagList[,<span class="dv">1</span><span class="sc">:</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">1</span>)]</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># run lagged mdrqa</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(lagList)[<span class="dv">1</span>]) {</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create temporary data matrix</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  temp_ts1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="fu">dim</span>(ts1)[<span class="dv">2</span>], <span class="at">nrow =</span> <span class="fu">length</span>((<span class="dv">1</span><span class="sc">+</span>lagList[i,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts1)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,<span class="dv">1</span>])))</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  temp_ts2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="fu">dim</span>(ts2)[<span class="dv">2</span>], <span class="at">nrow =</span> <span class="fu">length</span>((<span class="dv">1</span><span class="sc">+</span>lagList[i,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts2)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,<span class="dv">1</span>])))</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># construct lagged time series</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(ts1)[<span class="dv">2</span>]) {</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    temp_ts1[,j] <span class="ot">&lt;-</span> ts1[(<span class="dv">1</span><span class="sc">+</span>lagList[i,j])<span class="sc">:</span>(<span class="fu">dim</span>(ts1)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[i,j]),j]</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(ts2)[<span class="dv">2</span>]) {</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    temp_ts2[,j] <span class="ot">&lt;-</span> ts2[(<span class="dv">1</span><span class="sc">+</span>lagList[j,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts2)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[j,<span class="dv">1</span>]),j]</span>
 <span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(ts2)[<span class="dv">2</span>]) {</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    temp_ts2[,j] <span class="ot">&lt;-</span> ts2[(<span class="dv">1</span><span class="sc">+</span>lagList[j,<span class="dv">1</span>])<span class="sc">:</span>(<span class="fu">dim</span>(ts2)[<span class="dv">1</span>]<span class="sc">-</span>maxlag<span class="sc">+</span>lagList[j,<span class="dv">1</span>]),j]</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rund mdrqa</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        temp_res <span class="ot">&lt;-</span> <span class="fu">crqa</span>(<span class="at">ts1=</span>temp_ts1, <span class="at">ts2=</span>temp_ts2, <span class="at">delay =</span> delay, <span class="at">embed =</span> embed,</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>                         <span class="at">rescale =</span> rescale, <span class="at">radius =</span> radius, <span class="at">normalize =</span> normalize,</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mindiagline =</span> mindiagline, <span class="at">minvertline =</span> minvertline,</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>                         <span class="at">tw =</span> tw, <span class="at">method =</span> <span class="st">"mdcrqa"</span>)</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        <span class="co"># store recurrence measures on each iteration</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>        results[i,<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>] <span class="ot">&lt;-</span> <span class="fu">unlist</span>(temp_res[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>} </span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rund mdrqa</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>        temp_res <span class="ot">&lt;-</span> <span class="fu">crqa</span>(<span class="at">ts1=</span>temp_ts1, <span class="at">ts2=</span>temp_ts2, <span class="at">delay =</span> delay, <span class="at">embed =</span> embed,</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>                         <span class="at">rescale =</span> rescale, <span class="at">radius =</span> radius, <span class="at">normalize =</span> normalize,</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mindiagline =</span> mindiagline, <span class="at">minvertline =</span> minvertline,</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>                         <span class="at">tw =</span> tw, <span class="at">method =</span> <span class="st">"mdcrqa"</span>)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># store recurrence measures on each iteration</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>        results[i,<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>] <span class="ot">&lt;-</span> <span class="fu">unlist</span>(temp_res[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>])</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>} </span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co"># convert results to data frame</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(results)</span>
 <span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co"># convert results to data frame</span></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(results)</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co"># generate and add labels</span></span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>newLabels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"RR"</span>,<span class="st">"DER"</span>,<span class="st">"NRLINE"</span>,<span class="st">"maxL"</span>,<span class="st">"L"</span>,<span class="st">"ENTR"</span>,<span class="st">"rENTR"</span>,<span class="st">"LAM"</span>,<span class="st">"TT"</span>)</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">10</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">+</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">2</span>))) {</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> j<span class="sc">+</span><span class="dv">1</span></span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>  newLabels[i] <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"ts"</span>,<span class="fu">as.character</span>(j),<span class="at">sep=</span><span class="st">""</span>)</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(results) <span class="ot">&lt;-</span> newLabels</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co"># generate and add labels</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>newLabels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"RR"</span>,<span class="st">"DER"</span>,<span class="st">"NRLINE"</span>,<span class="st">"maxL"</span>,<span class="st">"L"</span>,<span class="st">"ENTR"</span>,<span class="st">"rENTR"</span>,<span class="st">"LAM"</span>,<span class="st">"TT"</span>)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">10</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">+</span>(<span class="fu">dim</span>(lagList)[<span class="dv">2</span>]<span class="sc">-</span><span class="dv">2</span>))) {</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> j<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>  newLabels[i] <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"ts"</span>,<span class="fu">as.character</span>(j),<span class="at">sep=</span><span class="st">""</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(results) <span class="ot">&lt;-</span> newLabels</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="co"># sort data frame by RR</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>RR, <span class="at">decreasing =</span> <span class="cn">TRUE</span>),]</span>
 <span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="co"># sort data frame by RR</span></span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results[<span class="fu">order</span>(results<span class="sc">$</span>RR, <span class="at">decreasing =</span> <span class="cn">TRUE</span>),]</span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="co"># return results</span></span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(results)</span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="co"># return results</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(results)</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Choose some value for the „maxlag“ parameter between 10-30. Investigate the lag structure compared to the Lorenz system plot.</p>
 <div class="cell">
