@@ -4,7 +4,7 @@ project:
 book:
   title: "Nonlinear Methods Workshop Lecture Notes"
   author: "Dan Mønster, Alon Tomashin, Ralf Cox, Giuseppe Leonardi, Sebastian Wallot"
-  date: "4/16/2024"
+  date: "July 2024"
   chapters:
     - index.qmd
     - intro.qmd
