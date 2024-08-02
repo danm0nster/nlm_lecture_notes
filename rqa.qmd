@@ -1,3 +1,71 @@
 # Recurrence Quantification Analysis
 
-Under construction
+## Running a RQA on categorical data - Exercise 1
+
+In this first exercise you will have to fill in the parameters
+in a few categorical RQA. It should be quite easy :)
+Observe the time series first, by plotting it, and compare it to its
+shuffled version. Look at the recurrence plots from these first two
+analyses - there should be a noticeable qualitative difference between the two.
+Finally check the recurrence measures from the two analyses and compare them
+
+
+```{r}
+#| eval: false
+
+#require(nonlinearTseries)
+require(crqa)
+
+# Set the working directory
+setwd("...")  # fill in the path where you saved the data
+
+# Load data
+cat1 <- read.table(file = "categoricts1.txt", header = F)$V1
+
+# Create a (replicable) shuffled version of the data
+set.seed(3245)
+cat1sh <- sample(cat1)
+
+# Have a look at the data - first observations
+plot(cat1, type = 'b', axes = F, ylab = "Categorical TS1")
+axis(2, at = c(1, 2, 3, 4), labels = c("1", "2", "3", "4"), las = 1)
+axis(1, at = c(0, 100, 200, 300, 400, 500, 600),
+     labels = c("0", "100", "200", "300", "400", "500", "600"), las = 1)
+
+plot(cat1sh, type = 'b', axes = F, ylab = "Categorical TS1 - shuffled")
+axis(2, at = c(1, 2, 3, 4), labels = c("1", "2", "3", "4"), las = 1)
+axis(1, at = c(0, 100, 200, 300, 400, 500, 600),
+     labels = c("0", "100", "200", "300", "400", "500", "600"), las = 1)
+
+
+# Run categorical recurrence analysis
+
+RQA_cat1 <- crqa(ts1 = cat1,
+                 ts2 = cat1,
+                 delay = ...,      # CHOOSE AN APPROPRIATE PARAMETER
+                 embed = ...,      # CHOOSE AN APPROPRIATE PARAMETER
+                 radius = ...,     # CHOOSE AN APPROPRIATE PARAMETER
+                 tw = 1
+                )
+
+plot_rp(RQA_cat1$RP)
+
+RQA_cat1sh <- crqa(ts1 = cat1sh,
+                   ts2 = cat1sh,
+                   delay = ...,    # CHOOSE AN APPROPRIATE PARAMETER
+                   embed = ...,    # CHOOSE AN APPROPRIATE PARAMETER
+                   radius = ...,   # CHOOSE AN APPROPRIATE PARAMETER
+                   tw = 1
+                  )
+
+plot_rp(RQA_cat1sh$RP)
+
+# Create a summary table for the 2 analyses and observe the RQA measures
+df1 <- as.data.frame(rbind(catTS1 = RQA_cat1[1:9],
+                           catTS1sh = RQA_cat1sh[1:9]))
+df1
+
+# Try to repeat the analysis with another time series
+# --> categoricts2.txt
+```
+
